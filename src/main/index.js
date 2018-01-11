@@ -45,23 +45,18 @@ app.on('activate', () => {
 
 const ipc = require('electron').ipcMain
 const dialog = require('electron').dialog
-const shell = require('electron').shell
 
 ipc.on('save-dialog', function (event,option) {
-    dialog.showSaveDialog(option, function (filename) {
-        event.sender.send('saved-file', filename)
-    })
-})
+    dialog.showSaveDialog(option, function (filePath) {
+        event.sender.send('save-dialog',filePath);
+    });
+});
 
 ipc.on('open-dialog', function (event,option) {
     dialog.showOpenDialog(option,function (files) {
-        event.sender.send('open-dialog', files)
-    })
-})
-
-ipc.on('open-file', function (event,filePath) {
-    shell.openItem(filePath);
-})
+        event.sender.send('open-dialog',files);
+    });
+});
 
 ipc.on('get-app-path', function (event) {
     event.returnValue = app.getAppPath();
@@ -71,7 +66,7 @@ import logic from '../logic/index';
 ipc.on('app-logic',async function (event,logicName,param) {
     let result = await logic.doLogic(logicName,param);
     event.returnValue = result;
-})
+});
 
 /**
  * Auto Updater

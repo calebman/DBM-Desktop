@@ -9,17 +9,11 @@
                 <Icon type="ios-analytics-outline"></Icon>
                 {{table.tableName}}
                 &nbsp;&nbsp;
-                <Tooltip :content="'查看'+table.tableName+'详情'" placement="bottom" transfer>
-                    <a @click.prevent="showTable"><Icon type="ios-search" size="18"></Icon></a>
-                </Tooltip>
+                <a @click.prevent="showTable"><Icon type="ios-search" size="18"></Icon></a>
                 &nbsp;&nbsp;
-                <Tooltip content="新增列" placement="bottom" transfer>
-                    <a @click.prevent="addColumn"><Icon type="ios-plus-empty" size="20"></Icon></a>
-                </Tooltip>
+                <a @click.prevent="addColumn"><Icon type="ios-plus-empty" size="20"></Icon></a>
                 &nbsp;&nbsp;
-                <Tooltip :content="selectColumnDatas.length == 0?'删除'+table.tableName:'删除选中列'" placement="bottom" transfer>
-                    <a @click.prevent="deleteColumn"><Icon type="ios-close-empty" size="20" color="red"></Icon></a>
-                </Tooltip>
+                <a @click.prevent="deleteColumn"><Icon type="ios-close-empty" size="20" color="red"></Icon></a>
                 </Col>
                 <Col span="6">
                 <span class="mainStyle">共&nbsp;</span>

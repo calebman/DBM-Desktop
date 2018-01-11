@@ -1,49 +1,53 @@
-import Vue from 'vue'
-import App from './App'
+import Vue from 'vue';
+import App from './App';
 import Router from 'vue-router';
 import Vuex from 'vuex';
 import Util from './libs/util';
 import cookie from './libs/cookie';
 import iView from 'iview';
 import 'iview/dist/styles/iview.css';
-
 import {routers, otherRouter, appRouter} from './router/index';
-
 import VueI18n from 'vue-i18n';
 import Locales from './locale';
 import zhLocale from 'iview/src/locale/lang/zh-CN';
 import enLocale from 'iview/src/locale/lang/en-US';
 import zhTLocale from 'iview/src/locale/lang/zh-TW';
-
 import electron from 'electron';
+
 
 Vue.prototype.appPath = 'http://127.0.0.1:12500/file';
 Vue.prototype.appFilePath = 'C:/Users/Lenovo/Desktop/nginx-1.13.6/files';
 if (!process.env.IS_WEB) {
     Vue.use(require('vue-electron'));
+    const shell = require('electron').shell
     const ipc = electron.ipcRenderer;
-    Vue.prototype.getSaveFilePath = function (param, options, callback) {
+    const dialog = require('electron').dialog
+
+    Vue.prototype.getSaveFilePath = function (options) {
         ipc.send('save-dialog', options);
         ipc.once('saved-file', function (event, path) {
-            callback(path, Vue.prototype.doLogic, param);
-        })
+            callback(path);
+        });
     };
-    Vue.prototype.getOpenFilePath = function (param, options, callback) {
+
+    Vue.prototype.getOpenFilePath = function (options, callback) {
         ipc.send('open-dialog', options);
         ipc.once('open-dialog', function (event, files) {
-            callback(files, Vue.prototype.doLogic, param);
-        })
+            callback(files);
+        });
     };
+
     Vue.prototype.openFile = function (filePath) {
-        ipc.send('open-file', filePath);
+        shell.openItem(filePath);
     }
+
     let gotAppPath = ipc.sendSync('get-app-path');
     if (gotAppPath.indexOf('DBM') > -1)
         gotAppPath = gotAppPath.substring(0, gotAppPath.indexOf('DBM') + 'DBM'.length+1) + 'data';
     if (process.env.BUILD_TARGET) {
         Vue.prototype.appPath = gotAppPath;
         Vue.prototype.appFilePath = gotAppPath;
-    }
+    };
     //C:\Users\Lenovo\AppData\Local\Programs\DBM\resources\app.asar
     console.log('app path is ' + gotAppPath);
 
@@ -57,7 +61,7 @@ if (!process.env.IS_WEB) {
         let result = ipc.sendSync('app-logic', logicName, param);
         console.info(logicName +' return '+JSON.stringify(result));
         return result;
-    }
+    };
 }
 Vue.config.productionTip = false;
 Vue.use(iView);

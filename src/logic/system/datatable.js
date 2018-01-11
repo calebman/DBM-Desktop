@@ -80,8 +80,9 @@ var deleteDataFromTable = async function (table, rowData, appFilePath) {
     return await conn.execute(sql);
 }
 
-var exportExcelFromTable = async function (table,filePath) {
-    let sql = squel.select().from(conn.config.database+'.'+table.tableName).toString();
+var exportExcelFromTable = async function (table,filterParam,filePath) {
+    let sql = squel.select().from(conn.config.database+'.'+table.tableName)
+        .where(systemUtil.createFilter(table.tableName,filterParam));
     let columns = table.cols.map(function (item) {
         return item['columnName'];
     })
@@ -98,10 +99,11 @@ var exportExcelFromTable = async function (table,filePath) {
     return true;
 }
 
-var exportExcelAndFileFromTable =  async function (table,dirPath,appFilePath) {
+var exportExcelAndFileFromTable =  async function (table,filterParam,dirPath,appFilePath) {
     let rootPath = dirPath+"\\"+table.tableName;
     systemUtil.mkdirsSync(rootPath);
-    let sql = squel.select().from(conn.config.database+'.'+table.tableName).toString();
+    let sql = squel.select().from(conn.config.database+'.'+table.tableName)
+        .where(systemUtil.createFilter(table.tableName,filterParam));
     let textColumns = [];
     let columns = table.cols.map(function (item) {
         if(item['dataType'] == 'text')

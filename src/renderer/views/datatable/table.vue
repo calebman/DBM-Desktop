@@ -290,34 +290,33 @@
                     this.$Message.warning('该功能需要electron的支持');
                     return ;
                 }
-                if (dbmUtil.hasFileColumn(this.table.cols)) {
-                    this.getOpenFilePath(this, {
-                        properties: ['openDirectory']
-                    }, function (files, doLogic, ctx) {
+                var self = this;
+                if (dbmUtil.hasFileColumn(self.table.cols)) {
+                    this.getOpenFilePath({properties: ['openDirectory']},function (files) {
                         if (!files||!files.length||files.length == 0)
                             return;
                         let dirPath = files[0];
-                        doLogic('exportExcelAndFileFromTable',ctx.table, dirPath, ctx.appFilePath);
-                        ctx.$Modal.confirm({
+                        self.doLogic('exportExcelAndFileFromTable',self.table,self.filterParam, dirPath, self.appFilePath);
+                        self.$Modal.confirm({
                             title: 'Excel与附件数据导出成功',
                             content: '<span style="font-size: 18px">是否需要打开文件夹</span>',
                             onOk: () => {
-                                ctx.openFile(dirPath + "\\" + ctx.table.tableName);
+                                self.openFile(dirPath + "\\" + self.table.tableName);
                             }
                         });
-                    })
-                } else {
-                    this.getSaveFilePath(this, {
+                    });
+                }else{
+                    this.getSaveFilePath({
                         title: '导出为Excel文件',
                         filters: [{name: 'Excel', extensions: ['xls', 'xlsx']}]
-                    }, function (filePath, doLogic, ctx) {
+                    },function (filePath) {
                         if (filePath) {
-                            doLogic('exportExcelFromTable',ctx.table, filePath);
-                            ctx.$Modal.confirm({
+                            self.doLogic('exportExcelFromTable',self.table,self.filterParam, filePath);
+                            self.$Modal.confirm({
                                 title: '导出Excel成功',
                                 content: '<span style="font-size: 18px">是否需要打开文件</span>',
                                 onOk: () => {
-                                    ctx.openFile(filePath);
+                                    self.openFile(filePath);
                                 }
                             });
                         }
@@ -410,22 +409,23 @@
                     this.$Message.warning('该功能需要electron的支持');
                     return;
                 }
-                this.getOpenFilePath(this, {
-                    properties: ['openFile']
-                }, function (files, mysql, ctx) {
-                    if (!files||!files.length||files.length == 0)
-                        return;
-                    let filePath = files[0];
-                    let fileName = filePath.substring(filePath.lastIndexOf('\\')+1,filePath.length);
-                    let fileValue = {dir:uuid.v1().replace(/[&\|\\\*^%$#@\-]/g,""),files:[]};
-                    if(dbmUtil.isFileColumn(ctx.$data.tableData[rowIndex][field]))
-                        fileValue = JSON.parse(ctx.$data.tableData[rowIndex][field]);
-                    let filesArray = fileValue.files;
-                    filesArray.splice(filesArray.length,0,fileName);
-                    ctx.onValueChange(rowIndex, rowData, field, JSON.stringify({
-                        dir:fileValue.dir,
-                        files:filesArray
-                    }),filePath);
+                let self = this;
+                this.getOpenFilePath( {
+                        properties: ['openFile']
+                },function (files) {
+                    if (files&&files.length&&files.length>0){
+                        let filePath = files[0];
+                        let fileName = filePath.substring(filePath.lastIndexOf('\\')+1,filePath.length);
+                        let fileValue = {dir:uuid.v1().replace(/[&\|\\\*^%$#@\-]/g,""),files:[]};
+                        if(dbmUtil.isFileColumn(self.$data.tableData[rowIndex][field]))
+                            fileValue = JSON.parse(self.$data.tableData[rowIndex][field]);
+                        let filesArray = fileValue.files;
+                        filesArray.splice(filesArray.length,0,fileName);
+                        self.onValueChange(rowIndex, rowData, field, JSON.stringify({
+                            dir:fileValue.dir,
+                            files:filesArray
+                        }),filePath);
+                    }
                 })
             },
             filePreviewDelete(deleteIndex) {

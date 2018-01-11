@@ -116,21 +116,23 @@
                 let filePath = this.appFilePath+'\\'+this.fileValue.dir+'\\'+this.fileValue.files[this.showIndex];
                 let fileName = this.fileValue.files[this.showIndex];
                 let suffix = this.getSuffix(fileName);
-                this.getSaveFilePath(this, {
-                        title: '文件另存为',
-                        filters: [{name: suffix, extensions: [suffix]}]
-                    }, function (currentPath, doLogic, ctx) {
-                    if(!currentPath)
-                        return;
-                    doLogic('pipeFile',filePath,currentPath);
-                    ctx.$Modal.confirm({
-                        title: '保存成功',
-                        content: '<span style="font-size: 18px">是否需要打开文件</span>',
-                        onOk: () => {
-                            ctx.openFile(currentPath);
-                        }
-                    });
+                let self = this;
+                self.getSaveFilePath({
+                    title: '文件另存为',
+                    filters: [{name: suffix, extensions: [suffix]}]
+                },function (currentPath) {
+                    if(currentPath){
+                        self.doLogic('pipeFile',filePath,currentPath);
+                        self.$Modal.confirm({
+                            title: '保存成功',
+                            content: '<span style="font-size: 18px">是否需要打开文件</span>',
+                            onOk: () => {
+                                self.openFile(currentPath);
+                            }
+                        });
+                    }
                 })
+
             },
             open(){
                 if (process.env.IS_WEB){
